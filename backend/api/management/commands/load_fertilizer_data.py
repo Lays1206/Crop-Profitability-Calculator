@@ -1,5 +1,5 @@
 import csv
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from api.models import Fertilizer, FertilizerQualityChance
 
 # Handles migrations/data loading for fertilizer and fertilizer quality chance models
@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
             for row in fertilizer_reader:
                 fertilizer = None
-                if row["fertilizer"]:
+                if row["fertilizer"].strip():
                     fertilizer, _ = Fertilizer.objects.get_or_create(type=row["fertilizer"].strip())
 
                 FertilizerQualityChance.objects.update_or_create(

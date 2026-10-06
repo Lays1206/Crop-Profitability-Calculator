@@ -32,7 +32,7 @@ class FertilizerSerializer(serializers.ModelSerializer):
 
 
 class FertilizerQualityChanceSerializer(serializers.ModelSerializer):
-    fertilizer = FertilizerSerializer(many=True)
+    fertilizer = FertilizerSerializer(read_only=True)
     class Meta:
         model = FertilizerQualityChance
         fields = '__all__'

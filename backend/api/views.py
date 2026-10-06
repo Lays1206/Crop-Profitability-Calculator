@@ -5,8 +5,6 @@ from rest_framework.views import APIView
 from .models import Crop, Season, FertilizerQualityChance
 from .serializers import CropSerializer, SeasonSerializer, FertilizerQualityChanceSerializer
 
-# Create your views here.
-
 class APIRootView(APIView):
     def get(self, request):
         data = {
