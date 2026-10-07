@@ -1,4 +1,4 @@
-# Stardew Valley Crop Profitability Calculator (WIP) 
+# Crop Profitability Calculator (WIP) 
 
 A Django REST Framework API that models Stardew Valley crops, seasons, and fertilizers to help players find the most profitable crops for each season. A React frontend is in progress.
 
