@@ -1,5 +1,5 @@
 from rest_framework import generics
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
@@ -37,13 +37,20 @@ class GoldPerDayList(generics.ListAPIView):
     serializer_class = CropQuerySetSerializer
 
     def get_queryset(self):
-        farming_level = int(self.request.query_params.get('farming_level', 0))
+        farming_level = self.request.query_params.get('farming_level', 0)
+        try:
+            farming_level = int(farming_level)
+        except ValueError:
+            raise ValidationError({"detail": f"Invalid farming_level '{farming_level}'; must be an integer from 0-14."})
+        
         fertilizer_type = self.request.query_params.get('fertilizer')
 
         try:
             quality = FertilizerQualityChance.objects.get(fertilizer__type=fertilizer_type, farming_level=farming_level)
         except FertilizerQualityChance.DoesNotExist:
-            raise NotFound(f"No quality chance for farming level '{farming_level}' and fertilizer '{fertilizer_type}'.")
+            raise ValidationError({"detail": f"Invalid farming_level '{farming_level}' or "
+                                             f"fertilizer '{fertilizer_type}'. farming_level must be 0-14 "
+                                             f"and fertilizer must be Basic, Quality, or Deluxe."})
 
         queryset = Crop.objects.with_gold_per_day(float(quality.average_price))
         return queryset.order_by("-gold_per_day")
