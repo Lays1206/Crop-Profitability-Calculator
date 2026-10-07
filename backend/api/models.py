@@ -1,6 +1,5 @@
 from django.db import models
-
-# Create your models here.
+from django.db.models import F, Value
 
 SEASON_DAYS = 28
 
@@ -18,7 +17,16 @@ class Season(models.Model):
 
     def __str__(self):
         return self.name
-    
+
+
+class CropQuerySet(models.QuerySet):
+    def with_gold_per_day(self, price_multiplier=1.0):
+        price = F('sell_price') * Value(price_multiplier)
+        growing_days = F('growth_time') + ((F('max_harvest') - 1) * F('days_to_regrow'))
+
+        return self.annotate(gold_per_day=
+                             ((F('max_harvest') * price) - F('seed_price')) / growing_days)
+
 
 class Crop(models.Model):
     name = models.CharField(max_length=100)
@@ -30,6 +38,8 @@ class Crop(models.Model):
     multiharvest = models.BooleanField(default=False, blank=True)
     days_to_regrow = models.IntegerField(default=0, blank=True)
     max_harvest = models.IntegerField(default=1, blank=True)
+
+    objects = CropQuerySet.as_manager()
 
     class Meta:
         ordering = ['pk']
